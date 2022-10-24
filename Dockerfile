@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:14
 
 RUN apt-get update \
     && apt-get install -y wget gnupg ca-certificates \
