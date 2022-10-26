@@ -3,6 +3,7 @@ const getFacebookMetrics = require("./src/facebook-api");
 const getTwitterMetrics = require("./src/twitter-api");
 const getYoutubeMetrics = require("./src/youtube-api");
 const getMangoolsMetrics = require("./src/mangools-api");
+const getInstaMetrics = require("./src/instagram-api");
 const Competitor = require("./src/common/models/competitor.schema");
 const Analytic = require("./src/common/models/analytics.schema");
 require("./src/common/db")();
@@ -57,6 +58,7 @@ app.get("/count/:clientId", async (req, res) => {
       let twitterMetrics = "";
       let youtubeMetrics = "";
       let facebookMetrics = "";
+      let instagramMetrics = "";
 
       //---------------------------------------------------------------------------
       // social media metrics for
@@ -79,6 +81,11 @@ app.get("/count/:clientId", async (req, res) => {
         (socialMedia) => socialMedia.name === "Facebook"
       );
 
+      // check if competitor has Instagram
+      const instagram = competitorsSocialMedia.find(
+        (socialMedia) => socialMedia.name === "Instagram"
+      );
+
       // get twitter metrics
       if (twitter?.url) {
         twitterMetrics = await getTwitterMetrics(twitter.url);
@@ -93,6 +100,12 @@ app.get("/count/:clientId", async (req, res) => {
       if (facebook?.url) {
         facebookMetrics = await getFacebookMetrics(facebook.url);
         console.log(facebookMetrics, 'index js - facebook metrics');
+      }
+
+      // get instagram metrics
+      if (instagram?.url) {
+        instagramMetrics = await getInstaMetrics(instagram.url);
+        console.log(instagramMetrics, 'index js - insta metrics');
       }
 
       //---------------------------------------------------------------------------
@@ -110,6 +123,7 @@ app.get("/count/:clientId", async (req, res) => {
           twitter: twitterMetrics,
           youtube: youtubeMetrics,
           facebook: facebookMetrics,
+          instagram: instagramMetrics,
         },
         website: {
           mangools: mangoolsMetrics,
@@ -118,11 +132,11 @@ app.get("/count/:clientId", async (req, res) => {
     }
 
     //save analytics to db
-    await Analytic.create({
-      clientId,
-      createAt: new Date(),
-      analytics: Analytics,
-    });
+    // await Analytic.create({
+    //   clientId,
+    //   createAt: new Date(),
+    //   analytics: Analytics,
+    // });
     res.json(Analytics);
     // return {
     //   statusCode: 200,
