@@ -1,9 +1,9 @@
 const express = require("express");
+const axios = require("axios");
 const getFacebookMetrics = require("./src/facebook-api");
 const getTwitterMetrics = require("./src/twitter-api");
 const getYoutubeMetrics = require("./src/youtube-api");
 const getMangoolsMetrics = require("./src/mangools-api");
-const getInstaMetrics = require("./src/instagram-api");
 const Competitor = require("./src/common/models/competitor.schema");
 const Analytic = require("./src/common/models/analytics.schema");
 require("./src/common/db")();
@@ -104,7 +104,16 @@ app.get("/count/:clientId", async (req, res) => {
 
       // get instagram metrics
       if (instagram?.url) {
-        instagramMetrics = await getInstaMetrics(instagram.url);
+        let username = instagram.url.split('/')[3];
+        // instagramMetrics = await axios.get(`http://127.0.0.1:8000/insta/${username}`);
+        await axios.get(`http://127.0.0.1:8000/insta/${username}`)
+        .then(response => {
+          instagramMetrics = response.data;
+          // console.log(response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
         console.log(instagramMetrics, 'index js - insta metrics');
       }
 
@@ -132,11 +141,11 @@ app.get("/count/:clientId", async (req, res) => {
     }
 
     //save analytics to db
-    // await Analytic.create({
-    //   clientId,
-    //   createAt: new Date(),
-    //   analytics: Analytics,
-    // });
+    await Analytic.create({
+      clientId,
+      createAt: new Date(),
+      analytics: Analytics,
+    });
     res.json(Analytics);
     // return {
     //   statusCode: 200,

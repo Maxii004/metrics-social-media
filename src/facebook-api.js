@@ -15,6 +15,7 @@ const getFacebookMetrics = async (facebookUrl) => {
         console.log('browser launched');
         const page = await browser.newPage();
         console.log('page created');
+        await page.setDefaultNavigationTimeout(0);
         await page.goto(facebookUrl, {
             waitUntil: 'networkidle0',
         });;
